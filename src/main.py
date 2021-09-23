@@ -1,7 +1,7 @@
 # インストールした discord.py を読み込む
 import discord
 import os
-
+from discord.utils import get
 
 try:
     from local_settings import *
@@ -18,8 +18,9 @@ if os.getenv("TOKEN"):
     TOKEN = os.getenv("TOKEN")
     LOCAL_HOST = False
 
-intents = discord.Intents.default()
+intents = discord.Intents.all()
 intents.members = True
+intents.reactions = True
 
 # 接続に必要なオブジェクトを生成
 client = discord.Client(intents=intents)
@@ -251,30 +252,35 @@ async def remove_role(member, roleId):
 
 
 @client.event
-async def on_reaction_add(reaction, user):
-    if not user.bot:
-        await add_role(user, 890451203631218719)
-        if reaction.emoji == "1️⃣":
-            await add_role(user, 820310764652462130)
-        if reaction.emoji == "2️⃣":
-            await add_role(user, 803829039138603049)
-        if reaction.emoji == "3️⃣":
-            await add_role(user, 803828927805259796)
-        if reaction.emoji == "4️⃣":
-            pass
+async def on_raw_reaction_add(payload):
+    if not payload.member.bot:
+        if payload.channel_id == 890461420330819586:
+            await add_role(payload.member, 890451203631218719)
+            if payload.emoji.name == "1️⃣":
+                await add_role(payload.member, 820310764652462130)
+            if payload.emoji.name == "2️⃣":
+                await add_role(payload.member, 803829039138603049)
+            if payload.emoji.name == "3️⃣":
+                await add_role(payload.member, 803828927805259796)
+            if payload.emoji.name == "4️⃣":
+                pass
 
 
 @client.event
-async def on_reaction_remove(reaction, user):
-    if not user.bot:
-        if reaction.emoji == "1️⃣":
-            await remove_role(user, 820310764652462130)
-        if reaction.emoji == "2️⃣":
-            await remove_role(user, 803829039138603049)
-        if reaction.emoji == "3️⃣":
-            await remove_role(user, 803828927805259796)
-        if reaction.emoji == "4️⃣":
-            pass
+async def on_raw_reaction_remove(payload):
+    guild = client.get_guild(payload.guild_id)
+    member = guild.get_member(payload.user_id)
+    if not member.bot:
+        if payload.channel_id == 890461420330819586:
+            await remove_role(member, 890451203631218719)
+            if payload.emoji.name == "1️⃣":
+                await remove_role(member, 820310764652462130)
+            if payload.emoji.name == "2️⃣":
+                await remove_role(member, 803829039138603049)
+            if payload.emoji.name == "3️⃣":
+                await remove_role(member, 803828927805259796)
+            if payload.emoji.name == "4️⃣":
+                pass
 
 
 # Botの起動とDiscordサーバーへの接続
