@@ -222,7 +222,7 @@ async def on_message(message):
 下に書いてある番号に従って当てはまるリアクションボタンを1つ以上選択してね!
 :one: 隊員(ロケッターズクラン参加者)
 :two: BEAR(EFTをプレイしている方用、EFT所属部隊を選択)
-:three: BEAR(EFTをプレイしている方用、EFT所属部隊選択)
+:three: USEC(EFTをプレイしている方用、EFT所属部隊選択)
 :four: 無所属(どれにも当てはまらない方用)
     """,
             color=0x4169E1,
@@ -253,7 +253,7 @@ async def remove_role(member, roleId):
 
 @client.event
 async def on_raw_reaction_add(payload):
-    if not payload.member.bot:
+    if not payload.member.bot:828630349423837244
         if payload.channel_id == 890461420330819586:
             await add_role(payload.member, 890451203631218719)
             if payload.emoji.name == "1️⃣":
