@@ -297,7 +297,6 @@ async def on_raw_reaction_remove(payload):
     member = guild.get_member(payload.user_id)
     if not member.bot:
         if payload.channel_id == 890461420330819586:
-            await remove_role(member, 890451203631218719)
             if payload.emoji.name == "1️⃣":
                 await remove_role(member, 820310764652462130)
             if payload.emoji.name == "2️⃣":
