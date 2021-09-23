@@ -253,7 +253,7 @@ async def remove_role(member, roleId):
 
 @client.event
 async def on_raw_reaction_add(payload):
-    if not payload.member.bot:828630349423837244
+    if not payload.member.bot:
         if payload.channel_id == 890461420330819586:
             await add_role(payload.member, 890451203631218719)
             if payload.emoji.name == "1️⃣":
