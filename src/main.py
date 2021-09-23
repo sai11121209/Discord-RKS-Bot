@@ -219,6 +219,7 @@ async def on_message(message):
 最後にロケッターズサーバで活動するためにはロールという役職が必要になるよ!
 これがないとサーバで発言したり、ボイスチャットに参加できないから参加しよう!
 下に書いてある番号に従って当てはまるリアクションボタンを1つ以上選択してね!
+※間違えて選択してしまっても大丈夫だよ!もう一度選択してキャンセルするとロールが解除されるよ!
 
 :one: 隊員(ロケッターズクラン参加者)
 :two: BEAR(EFTをプレイしている方用、EFT所属部隊を選択)
@@ -236,7 +237,7 @@ async def on_message(message):
         await sendMessage.add_reaction("3️⃣")
         await sendMessage.add_reaction("4️⃣")
         embed = discord.Embed(
-            title="ロール選択",
+            title="さいごに",
             description="""
 ロール選択が済んだらやることはすべて完了だよ!!
 これですべてのカテゴリにアクセスできるようになったはずだよ!!
