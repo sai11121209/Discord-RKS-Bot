@@ -224,8 +224,22 @@ async def on_message(message):
 :two: BEAR(EFTをプレイしている方用、EFT所属部隊を選択)
 :three: USEC(EFTをプレイしている方用、EFT所属部隊選択)
 :four: 無所属(どれにも当てはまらない方用)
-
-一つ選んだらやることはすべて完了だよ!!
+    """,
+            color=0x4169E1,
+        )
+        embed.set_thumbnail(
+            url="http://drive.google.com/uc?export=view&id=17Xe7Pf-0VjJ9Sx9GzgtVMjqbjE9DxyVa",
+        )
+        sendMessage = await channel.send(embed=embed)
+        await sendMessage.add_reaction("1️⃣")
+        await sendMessage.add_reaction("2️⃣")
+        await sendMessage.add_reaction("3️⃣")
+        await sendMessage.add_reaction("4️⃣")
+        embed = discord.Embed(
+            title="ロール選択",
+            description="""
+ロール選択が済んだらやることはすべて完了だよ!!
+これですべてのカテゴリにアクセスできるようになったはずだよ!!
 それじゃあロケッターズサーバで良い時間を過ごしてね!
 行ってらっしゃい(｡･ω･)ﾉﾞ
 
@@ -246,10 +260,6 @@ async def on_message(message):
             url="http://drive.google.com/uc?export=view&id=17Xe7Pf-0VjJ9Sx9GzgtVMjqbjE9DxyVa",
         )
         sendMessage = await channel.send(embed=embed)
-        await sendMessage.add_reaction("1️⃣")
-        await sendMessage.add_reaction("2️⃣")
-        await sendMessage.add_reaction("3️⃣")
-        await sendMessage.add_reaction("4️⃣")
 
 
 # 役職追加時発火
