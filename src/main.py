@@ -1,5 +1,6 @@
 # インストールした discord.py を読み込む
 import discord
+import time
 import os
 from discord.utils import get
 import pytz
@@ -66,7 +67,7 @@ emojiList = {
 async def on_ready():
     # 起動したらターミナルにログイン通知が表示される
     print("ログインしました!")
-    change_status.start()
+    morning_call.start()
 
 
 # メッセージ受信時に動作する処理
@@ -346,82 +347,81 @@ async def on_raw_reaction_remove(payload):
 
 
 # @tasks.loop(seconds=5.0)
-@tasks.loop(time=datetime.time.fromisoformat(task_time))
-async def change_status():
-    now = datetime.datetime.utcfromtimestamp(
-        dt.now(pytz.timezone("Asia/Tokyo")).timestamp()
-    )
-    channel = client.get_channel(908026122283941888)
-    embed = discord.Embed(
-        title=f"皆さんおはようございます!\n{now.month}月{now.day}日 {now.hour}時{now.minute}分です!",
-        color=0x2ECC69,
-        timestamp=now,
-    )
-
-    # 天気取得
-    infoStr = ""
-    for area in AREA:
-        res = rq.get(
-            f"https://api.openweathermap.org/data/2.5/weather?q={area}&appid=0869838a492c3c73db4c246b908feafd&lang=ja&units=metric"
+@tasks.loop(time=datetime.time.fromisoformat(f'{task_time}+09:00'))
+async def morning_call():
+    now = datetime.datetime.now(datetime.timezone(datetime.timedelta(hours=9)))
+    if now.hour == 7 and now.minute == 00:
+        channel = client.get_channel(908026122283941888)
+        embed = discord.Embed(
+            title=f"皆さんおはようございます!\n{now.month}月{now.day}日 {now.hour}時{now.minute}分です!",
+            color=0x2ECC69,
+            timestamp=now,
         )
-        data = json.loads(res.text)
-        infoStr += f"> [{data['name']}](https://openweathermap.org/city/{data['id']}) {data['weather'][0]['description']}<:{data['weather'][0]['icon']}:{emojiList[data['weather'][0]['icon']]}>\n> **最高気温** {data['main']['temp_max']}\n> **最低気温** {data['main']['temp_min']}\n> **風速** {data['wind']['speed']}"
-    embed.add_field(name=f"Open Weather Map 天気予報", value=infoStr, inline=False)
 
-    # 主要ニュース取得 https://news.yahoo.co.jp/categories/domestic
-    infoStr = ""
-    user_agent = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.114 Safari/537.36"
-    header = {"User-Agent": user_agent}
-    res = rq.get("https://news.yahoo.co.jp/topics/top-picks", headers=header)
-    soup = BeautifulSoup(res.text)
-    soup = soup.find("div", class_="contentsWrap").find_all(
-        "div", class_="newsFeed_item_text"
-    )
-    for s in soup[:8]:
-        infoStr += f"> **[{s.next.get_text()}]({s.parent['href']})**\n"
-    embed.add_field(name=f"Yahoo! 主要ニュース", value=infoStr, inline=False)
+        # 天気取得
+        infoStr = ""
+        for area in AREA:
+            res = rq.get(
+                f"https://api.openweathermap.org/data/2.5/weather?q={area}&appid=0869838a492c3c73db4c246b908feafd&lang=ja&units=metric"
+            )
+            data = json.loads(res.text)
+            infoStr += f"> [{data['name']}](https://openweathermap.org/city/{data['id']}) {data['weather'][0]['description']}<:{data['weather'][0]['icon']}:{emojiList[data['weather'][0]['icon']]}>\n> **最高気温** {data['main']['temp_max']}\n> **最低気温** {data['main']['temp_min']}\n> **風速** {data['wind']['speed']}"
+        embed.add_field(name=f"Open Weather Map 天気予報", value=infoStr, inline=False)
 
-    # BTC情報取得
-    infoStr = ""
-    timestamp = (
-        dt.now(pytz.timezone("Asia/Tokyo")) - relativedelta(months=1)
-    ).timestamp()
-    summaryJpy = rq.get(
-        "https://api.cryptowat.ch/markets/bitflyer/btcjpy/summary"
-    ).json()["result"]
-    btcJpyData = rq.get(
-        f"https://api.cryptowat.ch/markets/bitflyer/btcjpy/ohlc?periods=1800&after={int(timestamp)}"
-    ).json()["result"]
-    btcData = pd.DataFrame(btcJpyData["1800"])
-    btcData[0] = pd.to_datetime(btcData[0].astype(int), unit="s")
-    plt.figure(figsize=(15, 10), dpi=100)
-    plt.plot(btcData[0], btcData[1], label="OpenPrice")
-    plt.plot(btcData[0], btcData[2], label="HighPrice")
-    plt.plot(btcData[0], btcData[3], label="LowPrice")
-    plt.title("BTC_JPY Rate")
-    plt.grid(axis="y", linestyle="dotted", color="b")
-    plt.tight_layout()
-    plt.legend()
-    plt.savefig("btc_jpy.png")
-    plt.close()
-    BtcJpyPrice = rq.get(
-        "https://api.cryptowat.ch/markets/bitflyer/btcjpy/price"
-    ).json()["result"]["price"]
-    file = discord.File("btc_jpy.png")
-    embed.set_image(url="attachment://btc_jpy.png")
-    infoStr += f"> 金額 {'{:,}'.format(BtcJpyPrice)} 円\n"
-    infoStr += f"> 最高値 {'{:,}'.format(summaryJpy['price']['high'])} 円\n"
-    infoStr += f"> 最安値 {'{:,}'.format(summaryJpy['price']['low'])} 円\n"
-    embed.add_field(name=f"Cryptowat Market ビットコイン情報", value=infoStr, inline=False)
+        # 主要ニュース取得 https://news.yahoo.co.jp/categories/domestic
+        infoStr = ""
+        user_agent = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.114 Safari/537.36"
+        header = {"User-Agent": user_agent}
+        res = rq.get("https://news.yahoo.co.jp/topics/top-picks", headers=header)
+        soup = BeautifulSoup(res.text)
+        soup = soup.find("div", class_="contentsWrap").find_all(
+            "div", class_="newsFeed_item_text"
+        )
+        for s in soup[:8]:
+            infoStr += f"> **[{s.next.get_text()}]({s.parent['href']})**\n"
+        embed.add_field(name=f"Yahoo! 主要ニュース", value=infoStr, inline=False)
 
-    embed.set_author(
-        name="Rocketers Guide",
-        url="https://github.com/sai11121209",
-        # icon_url=client.get_user(279995095124803595).avatar_url,
-    )
-    embed.set_footer(text="今日も一日頑張りましょう!")
-    await channel.send("@everyone 本日のお知らせ")
-    await channel.send(embed=embed, file=file)
+        # BTC情報取得
+        infoStr = ""
+        timestamp = (
+            dt.now(pytz.timezone("Asia/Tokyo")) - relativedelta(months=1)
+        ).timestamp()
+        summaryJpy = rq.get(
+            "https://api.cryptowat.ch/markets/bitflyer/btcjpy/summary"
+        ).json()["result"]
+        btcJpyData = rq.get(
+            f"https://api.cryptowat.ch/markets/bitflyer/btcjpy/ohlc?periods=1800&after={int(timestamp)}"
+        ).json()["result"]
+        btcData = pd.DataFrame(btcJpyData["1800"])
+        btcData[0] = pd.to_datetime(btcData[0].astype(int), unit="s")
+        plt.figure(figsize=(15, 10), dpi=100)
+        plt.plot(btcData[0], btcData[1], label="OpenPrice")
+        plt.plot(btcData[0], btcData[2], label="HighPrice")
+        plt.plot(btcData[0], btcData[3], label="LowPrice")
+        plt.title("BTC_JPY Rate")
+        plt.grid(axis="y", linestyle="dotted", color="b")
+        plt.tight_layout()
+        plt.legend()
+        plt.savefig("btc_jpy.png")
+        plt.close()
+        BtcJpyPrice = rq.get(
+            "https://api.cryptowat.ch/markets/bitflyer/btcjpy/price"
+        ).json()["result"]["price"]
+        file = discord.File("btc_jpy.png")
+        embed.set_image(url="attachment://btc_jpy.png")
+        infoStr += f"> 金額 {'{:,}'.format(BtcJpyPrice)} 円\n"
+        infoStr += f"> 最高値 {'{:,}'.format(summaryJpy['price']['high'])} 円\n"
+        infoStr += f"> 最安値 {'{:,}'.format(summaryJpy['price']['low'])} 円\n"
+        embed.add_field(name=f"Cryptowat Market ビットコイン情報", value=infoStr, inline=False)
+
+        embed.set_author(
+            name="Rocketers Guide",
+            url="https://github.com/sai11121209",
+            # icon_url=client.get_user(279995095124803595).avatar_url,
+        )
+        embed.set_footer(text="今日も一日頑張りましょう!")
+        await channel.send("@everyone", embed=embed, file=file)
+        time.sleep(60)
 
 
 # Botの起動とDiscordサーバーへの接続
