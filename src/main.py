@@ -1,17 +1,18 @@
 # インストールした discord.py を読み込む
-import discord
-import time
 import os
-from discord.utils import get
+import time
 import pytz
-import datetime
 import json
-import requests as rq
+import discord
+import datetime
 import pandas as pd
+import requests as rq
 from bs4 import BeautifulSoup
+from discord.utils import get
 from datetime import datetime as dt
-from discord.ext import commands, tasks
 from matplotlib import pyplot as plt
+from discord.ext import commands, tasks
+from decimal import Decimal, ROUND_HALF_UP
 from dateutil.relativedelta import relativedelta
 
 try:
@@ -36,7 +37,7 @@ intents.reactions = True
 # 接続に必要なオブジェクトを生成
 client = discord.Client(intents=intents)
 
-task_time = "07:00"
+task_time = "06:00"
 AREA = [
     "Tokyo",
     #    "Nagoya",
@@ -50,16 +51,36 @@ AREA = [
     #    "Sapporo",
 ]
 
+dname = [
+    "N",
+    "NNE",
+    "NE",
+    "ENE",
+    "E",
+    "ESE",
+    "SE",
+    "SSE",
+    "S",
+    "SSW",
+    "SW",
+    "WSW",
+    "W",
+    "WNW",
+    "NW",
+    "NNW",
+    "N",
+]
+
 emojiList = {
-    "01n": "908058939525046303",
-    "02n": "908058939541839933",
-    "03n": "908058939541815396",
-    "04n": "908058939533447168",
-    "09n": "908058939579564072",
-    "10n": "908058939579592705",
-    "11n": "908058939478933565",
-    "13n": "908058939600556032",
-    "50n": "908058939546017813",
+    "01d": "908058939525046303",
+    "02d": "908058939541839933",
+    "03d": "908058939541815396",
+    "04d": "908058939533447168",
+    "09d": "908058939579564072",
+    "10d": "908058939579592705",
+    "11d": "908058939478933565",
+    "13d": "908058939600556032",
+    "50d": "908058939546017813",
 }
 
 # 起動時に動作する処理
@@ -347,13 +368,13 @@ async def on_raw_reaction_remove(payload):
 
 
 # @tasks.loop(seconds=5.0)
-@tasks.loop(time=datetime.time.fromisoformat(f'{task_time}+09:00'))
+@tasks.loop(time=datetime.time.fromisoformat(f"{task_time}+09:00"))
 async def morning_call():
     now = datetime.datetime.now(datetime.timezone(datetime.timedelta(hours=9)))
-    if now.hour == 7 and now.minute == 00:
+    if now.hour == 6 and now.minute == 00:
         channel = client.get_channel(908026122283941888)
         embed = discord.Embed(
-            title=f"皆さんおはようございます!\n{now.month}月{now.day}日 {now.hour}時{now.minute}分です!",
+            title=f"皆さんおはようございます!\n{now.month}月{now.day}日 {str(now.hour).zfill(2)}時{str(now.minute).zfill(2)}分です!",
             color=0x2ECC69,
             timestamp=now,
         )
@@ -365,7 +386,18 @@ async def morning_call():
                 f"https://api.openweathermap.org/data/2.5/weather?q={area}&appid=0869838a492c3c73db4c246b908feafd&lang=ja&units=metric"
             )
             data = json.loads(res.text)
-            infoStr += f"> [{data['name']}](https://openweathermap.org/city/{data['id']}) {data['weather'][0]['description']}<:{data['weather'][0]['icon']}:{emojiList[data['weather'][0]['icon']]}>\n> **最高気温** {data['main']['temp_max']}\n> **最低気温** {data['main']['temp_min']}\n> **風速** {data['wind']['speed']}"
+            dindex = Decimal(str(data["wind"]["deg"] / 22.5)).quantize(
+                Decimal("0"), rounding=ROUND_HALF_UP
+            )
+            infoStr += f"> [{data['name']}](https://openweathermap.org/city/{data['id']}) {data['weather'][0]['description']}<:{data['weather'][0]['icon']}:{emojiList[data['weather'][0]['icon']]}>\n> ├**現在気温** {data['main']['temp']}℃\n> ├**最高気温** {data['main']['temp_max']}℃\n> ├**最低気温** {data['main']['temp_min']}℃\n> └**風** {data['wind']['speed']}m/s {dname[int(dindex)]}\n"
+            res = rq.get(
+                f"https://api.openweathermap.org/data/2.5/weather?&lat=35.4752&lon=139.8587&appid=0869838a492c3c73db4c246b908feafd&lang=ja&units=metric"
+            )
+            data = json.loads(res.text)
+            dindex = Decimal(str(data["wind"]["deg"] / 22.5)).quantize(
+                Decimal("0"), rounding=ROUND_HALF_UP
+            )
+            infoStr += f"> [{data['name']}](https://openweathermap.org/city/?lat={data['coord']['lat']}&lon={data['coord']['lon']}) {data['weather'][0]['description']}<:{data['weather'][0]['icon']}:{emojiList[data['weather'][0]['icon']]}>\n> ├**現在気温** {data['main']['temp']}℃\n> ├**最高気温** {data['main']['temp_max']}℃\n> ├**最低気温** {data['main']['temp_min']}℃\n> └**風** {data['wind']['speed']}m/s {dname[int(dindex)]}"
         embed.add_field(name=f"Open Weather Map 天気予報", value=infoStr, inline=False)
 
         # 主要ニュース取得 https://news.yahoo.co.jp/categories/domestic
@@ -409,7 +441,7 @@ async def morning_call():
         ).json()["result"]["price"]
         file = discord.File("btc_jpy.png")
         embed.set_image(url="attachment://btc_jpy.png")
-        infoStr += f"> 金額 {'{:,}'.format(BtcJpyPrice)} 円\n"
+        infoStr += f"> 現在値 {'{:,}'.format(BtcJpyPrice)} 円\n"
         infoStr += f"> 最高値 {'{:,}'.format(summaryJpy['price']['high'])} 円\n"
         infoStr += f"> 最安値 {'{:,}'.format(summaryJpy['price']['low'])} 円\n"
         embed.add_field(name=f"Cryptowat Market ビットコイン情報", value=infoStr, inline=False)
@@ -420,7 +452,11 @@ async def morning_call():
             # icon_url=client.get_user(279995095124803595).avatar_url,
         )
         embed.set_footer(text="今日も一日頑張りましょう!")
-        await channel.send("@everyone", embed=embed, file=file)
+        await channel.send(
+            "@everyone 改善中です。改善項目あれば #bot-update-request にてご連絡ください。",
+            embed=embed,
+            file=file,
+        )
         time.sleep(60)
 
 
