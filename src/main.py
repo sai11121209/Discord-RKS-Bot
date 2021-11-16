@@ -72,15 +72,15 @@ dname = [
 ]
 
 emojiList = {
-    "01d": "908058939525046303",
-    "02d": "908058939541839933",
-    "03d": "908058939541815396",
-    "04d": "908058939533447168",
-    "09d": "908058939579564072",
-    "10d": "908058939579592705",
-    "11d": "908058939478933565",
-    "13d": "908058939600556032",
-    "50d": "908058939546017813",
+    "01": "908058939525046303",
+    "02": "908058939541839933",
+    "03": "908058939541815396",
+    "04": "908058939533447168",
+    "09": "908058939579564072",
+    "10": "908058939579592705",
+    "11": "908058939478933565",
+    "13": "908058939600556032",
+    "50": "908058939546017813",
 }
 
 # 起動時に動作する処理
@@ -389,7 +389,7 @@ async def morning_call():
             dindex = Decimal(str(data["wind"]["deg"] / 22.5)).quantize(
                 Decimal("0"), rounding=ROUND_HALF_UP
             )
-            infoStr += f"> [{data['name']}](https://openweathermap.org/city/{data['id']}) {data['weather'][0]['description']}<:{data['weather'][0]['icon']}:{emojiList[data['weather'][0]['icon']]}>\n> ├**現在気温** {data['main']['temp']}℃\n> ├**最高気温** {data['main']['temp_max']}℃\n> ├**最低気温** {data['main']['temp_min']}℃\n> └**風** {data['wind']['speed']}m/s {dname[int(dindex)]}\n"
+            infoStr += f"> [{data['name']}](https://openweathermap.org/city/{data['id']}) {data['weather'][0]['description']}<:{data['weather'][0]['icon'][:2]}:{emojiList[data['weather'][0]['icon'][:2]]}>\n> ├**現在気温** {data['main']['temp']}℃\n> ├**最高気温** {data['main']['temp_max']}℃\n> ├**最低気温** {data['main']['temp_min']}℃\n> └**風** {data['wind']['speed']}m/s {dname[int(dindex)]}\n"
             res = rq.get(
                 f"https://api.openweathermap.org/data/2.5/weather?&lat=35.4752&lon=139.8587&appid=0869838a492c3c73db4c246b908feafd&lang=ja&units=metric"
             )
@@ -397,7 +397,7 @@ async def morning_call():
             dindex = Decimal(str(data["wind"]["deg"] / 22.5)).quantize(
                 Decimal("0"), rounding=ROUND_HALF_UP
             )
-            infoStr += f"> [{data['name']}](https://openweathermap.org/city/?lat={data['coord']['lat']}&lon={data['coord']['lon']}) {data['weather'][0]['description']}<:{data['weather'][0]['icon']}:{emojiList[data['weather'][0]['icon']]}>\n> ├**現在気温** {data['main']['temp']}℃\n> ├**最高気温** {data['main']['temp_max']}℃\n> ├**最低気温** {data['main']['temp_min']}℃\n> └**風** {data['wind']['speed']}m/s {dname[int(dindex)]}"
+            infoStr += f"> [{data['name']}](https://openweathermap.org/city/?lat={data['coord']['lat']}&lon={data['coord']['lon']}) {data['weather'][0]['description']}<:{data['weather'][0]['icon'][:2]}:{emojiList[data['weather'][0]['icon'][:2]]}>\n> ├**現在気温** {data['main']['temp']}℃\n> ├**最高気温** {data['main']['temp_max']}℃\n> ├**最低気温** {data['main']['temp_min']}℃\n> └**風** {data['wind']['speed']}m/s {dname[int(dindex)]}"
         embed.add_field(name=f"Open Weather Map 天気予報", value=infoStr, inline=False)
 
         # 主要ニュース取得 https://news.yahoo.co.jp/categories/domestic
