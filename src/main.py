@@ -28,7 +28,6 @@ except ImportError:
 # 自分のBotのアクセストークンに置き換えてください
 if os.getenv("TOKEN"):
     TOKEN = os.getenv("TOKEN")
-    print(TOKEN)
     LOCAL_HOST = False
 
 intents = discord.Intents.all()
@@ -460,10 +459,9 @@ async def morning_call():
         )
         time.sleep(60)
 
-print("a")
+
 # Botの起動とDiscordサーバーへの接続
 client.run(TOKEN)
-print("B")
 
 if os.getenv("TEST"):
     exit()
