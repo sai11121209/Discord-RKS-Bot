@@ -14,6 +14,7 @@ jobs:
     
     env:
       TOKEN: ${{secrets.TOKEN}}
+      TEST: ${{secrets.TEST}}
 
     steps:
     - uses: actions/checkout@v3
