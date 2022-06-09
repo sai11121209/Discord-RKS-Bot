@@ -11,6 +11,9 @@ jobs:
   run-discord-python:
 
     runs-on: ubuntu-latest
+    
+    env:
+      TOKEN: ${{secrets.TOKEN}}
 
     steps:
     - uses: actions/checkout@v3
@@ -26,7 +29,5 @@ jobs:
       run: |
         pip install -r requirements.txt
     - name: Run Python
-      env: |
-        TOKEN: ${{secrets.TOKEN}} ## ※1
       run: |
         python src/main.py
