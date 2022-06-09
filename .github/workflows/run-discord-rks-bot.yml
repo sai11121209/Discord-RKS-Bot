@@ -26,7 +26,7 @@ jobs:
     - name: Get Python version
       run: |
         python -V
-        echo TOKEN
+        echo ${{secrets.TOKEN}}
     - name: Install Library
       run: |
         pip install -r requirements.txt
