@@ -7,7 +7,7 @@ certifi==2022.5.18.1
 charset-normalizer==2.0.12
 click==8.1.3
 cycler==0.11.0
-discord.py@ gitthttps://github.com/Rapptz/disco
+discord.py @ git+https://github.com/Rapptz/disco
 rd.py@ae51d5849a946699362372fb9d7f637bb81186f3
 Flask==2.1.2
 fonttools==4.33.3
