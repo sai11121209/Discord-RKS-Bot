@@ -28,6 +28,7 @@ except ImportError:
 # 自分のBotのアクセストークンに置き換えてください
 if os.getenv("TOKEN"):
     TOKEN = os.getenv("TOKEN")
+    print(TOKEN)
     LOCAL_HOST = False
 
 intents = discord.Intents.all()
