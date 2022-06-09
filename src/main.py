@@ -460,5 +460,6 @@ async def morning_call():
         time.sleep(60)
 
 
+if os.getenv("TEST"):
 # Botの起動とDiscordサーバーへの接続
 client.run(TOKEN)
