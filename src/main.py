@@ -22,7 +22,7 @@ try:
 except ImportError:
     import keep_alive
 
-    keep_alive.keep_alive()
+    # keep_alive.keep_alive()
 
 
 # 自分のBotのアクセストークンに置き換えてください
@@ -89,6 +89,13 @@ async def on_ready():
     # 起動したらターミナルにログイン通知が表示される
     print("ログインしました!")
     morning_call.start()
+    await client.change_presence(
+        activity=discord.Game(
+            name="TEST(Backend: GoogleCloudPlatform, IP: 34.83.222.39, PID: 7863)",
+            start=dt.now(pytz.timezone("Asia/Tokyo")),
+            type=5,
+        )
+    )
 
 
 # メッセージ受信時に動作する処理
@@ -460,8 +467,6 @@ async def morning_call():
         time.sleep(60)
 
 
-# Botの起動とDiscordサーバーへの接続
-client.run(TOKEN)
-
-if os.getenv("TEST"):
-    exit()
+if os.getenv("GITHUB_ACTIONS"):
+    # Botの起動とDiscordサーバーへの接続
+    client.run(TOKEN)
