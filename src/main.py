@@ -33,6 +33,8 @@ if os.getenv("TOKEN"):
 intents = discord.Intents.all()
 intents.members = True
 intents.reactions = True
+voiceChatRole = 839773477095211018
+notificationGneralChannelId = 839769626585333761
 
 # 接続に必要なオブジェクトを生成
 client = discord.Client(intents=intents)
@@ -102,8 +104,26 @@ async def on_ready():
 @client.event
 async def on_message(message):
     # メッセージ送信者がBotだった場合は無視する
-    if message.author.bot:
+    if message.author.bot or not len(message.content):
         return
+
+    attachmentData = None
+    attachmentsData = []
+    if message.channel.id == notificationGneralChannelId:
+        await message.delete()
+        if message.reference:
+            user = [
+                member
+                for member in message.guild.members
+                if message.reference.resolved.content.split(" by ")[1]
+                == member.name
+            ][0]
+            await message.channel.send(f"{user.mention} {message.content} by {message.author.name}")
+        else:
+            await message.channel.send(
+                f"@everyone {message.content} by {message.author.name}"
+            )
+            return 0
     # 「/neko」と発言したら「にゃーん」が返る処理
     if message.content == "/init":
         channel = client.get_channel(890461420330819586)
@@ -328,6 +348,36 @@ async def on_message(message):
         )
         sendMessage = await channel.send(embed=embed)
 
+# ボイスチャンネル参加・退出時発火
+@client.event
+async def on_voice_state_update(member, before, after):
+    # 本番テキストチャンネル
+    channel = client.get_channel(818751361511718942)
+    # テストテキストチャンネル
+    # channel = client.get_channel(808821063387316254)
+    user = str(member).split("#")[0]
+    if before.channel == None and after.channel:
+        await channel.send(
+            f"@everyone {user} がボイスチャンネル {after.channel} にてボイスチャットを開始しました。"
+        )
+        await client.add_role(member, voiceChatRole)
+    elif (
+        before.channel
+        and after.channel
+        and before.deaf == after.deaf
+        and before.mute == after.mute
+        and before.self_deaf == after.self_deaf
+        and before.self_mute == after.self_mute
+        and before.self_stream == after.self_stream
+        and before.self_video == after.self_video
+        and before.channel.id != after.channel.id
+    ):
+        await channel.send(
+            f"@everyone {user} がボイスチャンネル {before.channel} からボイスチャンネル {after.channel} に移動しました。"
+        )
+    elif before.channel and after.channel == None:
+        # await channel.send(f"@everyone {user} がボイスチャンネル {before.channel} を退出しました。")
+        await client.remove_role(member, voiceChatRole)
 
 # 役職追加時発火
 @client.event
