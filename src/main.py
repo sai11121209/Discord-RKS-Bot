@@ -467,6 +467,5 @@ async def morning_call():
         time.sleep(60)
 
 
-if os.getenv("GITHUB_ACTIONS"):
-    # Botの起動とDiscordサーバーへの接続
-    client.run(TOKEN)
+# Botの起動とDiscordサーバーへの接続
+client.run(TOKEN)
