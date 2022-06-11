@@ -1,5 +1,6 @@
 # インストールした discord.py を読み込む
 import os
+import re
 import time
 import pytz
 import json
@@ -124,6 +125,34 @@ async def on_message(message):
                 f"@everyone {message.content} by {message.author.name}"
             )
             return 0
+    if not message.author.bot and not LOCAL_HOST:
+        if re.search(r"出会い|繋がりたい|美女|美男|可愛い|募集|フレンド", message.content):
+            text = f"本discordサーバでは**出会い**を目的とした**フレンド募集**を含む投稿を全面的に禁止しています。\n\n 以下の文章が違反している可能性があります。\n\n **以下違反文** \n ```{message.content}```"
+            embed = discord.Embed(
+                title="警告!!",
+                description=text,
+                color=0xFF0000,
+            )
+
+            await message.channel.send(f"{message.author.mention}")
+            await message.channel.send(embed=embed)
+    try:
+        if (
+            message.guild.get_role(voiceChatRole) in message.author.roles
+            and message.channel.id != notificationGneralChannelId
+            and message.channel.id != 890618625508122624
+        ):
+            await message.delete()
+            if message.mentions:
+                await message.channel.send(
+                    f"<@&{voiceChatRole}> {message.mentions[0].mention} {message.content} by {message.author.name}"
+                )
+            else:
+                await message.channel.send(
+                    f"<@&{voiceChatRole}> {message.content} by {message.author.name}"
+                )
+    except:
+        pass
     # 「/neko」と発言したら「にゃーん」が返る処理
     if message.content == "/init":
         channel = client.get_channel(890461420330819586)
