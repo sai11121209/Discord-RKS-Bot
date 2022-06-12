@@ -27,6 +27,7 @@ jobs:
 
     - name: Google Cloud login
       run: |
+        echo ${{ steps.google-cloud-auth.outputs.credentials_file_path }}
         gcloud auth login --brief --cred-file="${{ steps.google-cloud-auth.outputs.credentials_file_path }}"
 
   # run-discord-python:
