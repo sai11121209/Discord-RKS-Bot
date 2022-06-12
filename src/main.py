@@ -93,7 +93,7 @@ async def on_ready():
     morning_call.start()
     await client.change_presence(
         activity=discord.Game(
-            name="サーバ監視!",
+            name="サーバ監視",
             start=dt.now(pytz.timezone("Asia/Tokyo")),
             type=5,
         )
