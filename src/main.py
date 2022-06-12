@@ -9,10 +9,9 @@ import datetime
 import pandas as pd
 import requests as rq
 from bs4 import BeautifulSoup
-from discord.utils import get
 from datetime import datetime as dt
 from matplotlib import pyplot as plt
-from discord.ext import commands, tasks
+from discord.ext import tasks
 from decimal import Decimal, ROUND_HALF_UP
 from dateutil.relativedelta import relativedelta
 
@@ -94,7 +93,7 @@ async def on_ready():
     morning_call.start()
     await client.change_presence(
         activity=discord.Game(
-            name="TEST(Backend: GoogleCloudPlatform, IP: 34.83.222.39, PID: 7863)",
+            name="サーバ監視中!",
             start=dt.now(pytz.timezone("Asia/Tokyo")),
             type=5,
         )
@@ -116,10 +115,11 @@ async def on_message(message):
             user = [
                 member
                 for member in message.guild.members
-                if message.reference.resolved.content.split(" by ")[1]
-                == member.name
+                if message.reference.resolved.content.split(" by ")[1] == member.name
             ][0]
-            await message.channel.send(f"{user.mention} {message.content} by {message.author.name}")
+            await message.channel.send(
+                f"{user.mention} {message.content} by {message.author.name}"
+            )
         else:
             await message.channel.send(
                 f"@everyone {message.content} by {message.author.name}"
@@ -377,6 +377,7 @@ async def on_message(message):
         )
         sendMessage = await channel.send(embed=embed)
 
+
 # ボイスチャンネル参加・退出時発火
 @client.event
 async def on_voice_state_update(member, before, after):
@@ -407,6 +408,7 @@ async def on_voice_state_update(member, before, after):
     elif before.channel and after.channel == None:
         # await channel.send(f"@everyone {user} がボイスチャンネル {before.channel} を退出しました。")
         await client.remove_role(member, voiceChatRole)
+
 
 # 役職追加時発火
 @client.event
@@ -539,7 +541,7 @@ async def morning_call():
         )
         embed.set_footer(text="今日も一日頑張りましょう!")
         await channel.send(
-            "@everyone 改善中です。改善項目あれば #bot-update-request にてご連絡ください。",
+            "@everyone",
             embed=embed,
             file=file,
         )
