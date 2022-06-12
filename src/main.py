@@ -111,20 +111,10 @@ async def on_message(message):
     attachmentsData = []
     if message.channel.id == notificationGneralChannelId:
         await message.delete()
-        if message.reference:
-            user = [
-                member
-                for member in message.guild.members
-                if message.reference.resolved.content.split(" by ")[1] == member.name
-            ][0]
-            await message.channel.send(
-                f"{user.mention} {message.content} by {message.author.name}"
-            )
-        else:
-            await message.channel.send(
-                f"@everyone {message.content} by {message.author.name}"
-            )
-            return 0
+        await message.channel.send(
+            f"@everyone {message.content} by {message.author.name}"
+        )
+        return 0
     if not message.author.bot and not LOCAL_HOST:
         if re.search(r"出会い|繋がりたい|美女|美男|可愛い|募集|フレンド", message.content):
             text = f"本discordサーバでは**出会い**を目的とした**フレンド募集**を含む投稿を全面的に禁止しています。\n\n 以下の文章が違反している可能性があります。\n\n **以下違反文** \n ```{message.content}```"
@@ -143,22 +133,19 @@ async def on_message(message):
             and message.channel.id != 890618625508122624
         ):
             await message.delete()
-            if message.reference:
-                user = [
-                    member
-                    for member in message.guild.members
-                    if message.reference.resolved.content.split(" by ")[1]
-                    == member.name
-                ][0]
-                await message.channel.send(
-                    f"{user.mention} {message.content} by {message.author.name}"
-                )
-            else:
-                await message.channel.send(
-                    f"<@&{voiceChatRole}> {message.content} by {message.author.name}"
-                )
-                return 0
-
+            await message.channel.send(
+                f"<@&{voiceChatRole}> {message.content} by {message.author.name}"
+            )
+            return 0
+        if message.reference:
+            user = [
+                member
+                for member in message.guild.members
+                if message.reference.resolved.content.split(" by ")[1] == member.name
+            ][0]
+            await message.channel.send(
+                f"{user.mention} {message.content} by {message.author.name}"
+            )
     except:
         pass
     # 「/neko」と発言したら「にゃーん」が返る処理
