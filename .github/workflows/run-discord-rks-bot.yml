@@ -8,28 +8,45 @@ on:
   workflow_dispatch:
 
 jobs:
-  run-discord-python:
 
-    runs-on: ubuntu-latest
-    
-    env:
-      TOKEN: ${{secrets.TOKEN}}
-      TEST: ${{secrets.TEST}}
+  login-google-cloud-platform:
 
     steps:
-    - uses: actions/checkout@v3
-    - name: Set up Python 3.8
-      uses: actions/setup-python@v3
+
+    - id: 'google-cloud-auth'
+      name: Authenticate to Google Cloud
+      uses: 'google-github-actions/auth@v0.7.0'
       with:
-          python-version: '3.8'
-          architecture: 'x64'
-    - name: Get Python version
+        create_credentials_file: true
+        workload_identity_provider: 'projects/${{YOUR_PROJECT_NUMBER}}/locations/global/workloadIdentityPools/${{YOUR_POOL_ID}}/providers/${{YOUR_PROVIDER_ID}}'
+        service_account: 'YOUR_SERVICE_ACCOUNT'
+
+    - name: Google Cloud login
       run: |
-        python -V
-        echo ${{secrets.TOKEN}}
-    - name: Install Library
-      run: |
-        pip install -r requirements.txt
-    - name: Run Python
-      run: |
-        python src/main.py
+        gcloud auth login --brief --cred-file="${{ steps.google-cloud-auth.outputs.credentials_file_path }}"
+
+  # run-discord-python:
+
+  #   runs-on: ubuntu-latest
+    
+  #   env:
+  #     TOKEN: ${{secrets.TOKEN}}
+  #     TEST: ${{secrets.TEST}}
+
+    # steps:
+    # - uses: actions/checkout@v3
+    # - name: Set up Python 3.8
+    #   uses: actions/setup-python@v3
+    #   with:
+    #       python-version: '3.8'
+    #       architecture: 'x64'
+    # - name: Get Python version
+    #   run: |
+    #     python -V
+    #     echo ${{secrets.TOKEN}}
+    # - name: Install Library
+    #   run: |
+    #     pip install -r requirements.txt
+    # - name: Run Python
+    #   run: |
+    #     python src/main.py
