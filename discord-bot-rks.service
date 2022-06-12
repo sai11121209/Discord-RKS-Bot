@@ -1,0 +1,14 @@
+[Unit]
+Description=Discord Bot RKS Process
+After=syslog.target network.target
+
+[Service]
+EnvironmentFile=/etc/sysconfig/discord-bot-rks-env
+WorkingDirectory=/home/sai11121209
+ExecStart=/home/sai11121209/envs/discord-bot-rks/bin/python /home/sai11121209/Discord-RKS-Bot/src/main.py
+Restart=always
+CPUShares=128
+CPUQuota=10%
+
+[Install]
+WantedBy=multi-user.target
