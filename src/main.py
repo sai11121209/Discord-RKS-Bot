@@ -143,14 +143,22 @@ async def on_message(message):
             and message.channel.id != 890618625508122624
         ):
             await message.delete()
-            if message.mentions:
+            if message.reference:
+                user = [
+                    member
+                    for member in message.guild.members
+                    if message.reference.resolved.content.split(" by ")[1]
+                    == member.name
+                ][0]
                 await message.channel.send(
-                    f"<@&{voiceChatRole}> {message.mentions[0].mention} {message.content} by {message.author.name}"
+                    f"{user.mention} {message.content} by {message.author.name}"
                 )
             else:
                 await message.channel.send(
                     f"<@&{voiceChatRole}> {message.content} by {message.author.name}"
                 )
+                return 0
+
     except:
         pass
     # 「/neko」と発言したら「にゃーん」が返る処理
