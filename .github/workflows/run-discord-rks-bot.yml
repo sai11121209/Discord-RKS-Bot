@@ -31,6 +31,15 @@ jobs:
         cat ${{ steps.google-cloud-auth.outputs.credentials_file_path }}
         gcloud auth login --brief --cred-file="${{ steps.google-cloud-auth.outputs.credentials_file_path }}"
 
+    - name: executing remote ssh commands using password
+      uses: appleboy/ssh-action@master
+      with:
+        host: ${{ secrets.HOST }}
+        username: ${{ secrets.USERNAME }}
+        key: ${{ secrets.KEY }}
+        port: ${{ secrets.PORT }}
+        script: whoami
+
   # run-discord-python:
 
   #   runs-on: ubuntu-latest
