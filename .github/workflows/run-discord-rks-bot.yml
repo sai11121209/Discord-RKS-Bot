@@ -10,7 +10,7 @@ on:
 jobs:
   deploy:
     runs-on: ubuntu-latest
-    
+
     permissions:
       contents: read
       id-token: write
@@ -23,7 +23,7 @@ jobs:
       with:
         create_credentials_file: true
         workload_identity_provider: 'projects/${{secrets.YOUR_PROJECT_NUMBER}}/locations/global/workloadIdentityPools/${{secrets.YOUR_POOL_ID}}/providers/${{secrets.YOUR_PROVIDER_ID}}'
-        service_account: 'YOUR_SERVICE_ACCOUNT'
+        service_account: <secrets.SERVICE_ACCOUNT_NAME>@<secrets.PROJECT_NAME>.iam.gserviceaccount.com
 
     - name: Google Cloud login
       run: |
