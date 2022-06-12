@@ -28,7 +28,6 @@ jobs:
 
     - name: Google Cloud login
       run: |
-        ${{secrets.YOUR_PROJECT_NUMBER}}
         cat ${{ steps.google-cloud-auth.outputs.credentials_file_path }}
         gcloud auth login --brief --cred-file="${{ steps.google-cloud-auth.outputs.credentials_file_path }}"
 
