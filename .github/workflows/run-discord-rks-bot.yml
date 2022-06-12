@@ -9,7 +9,7 @@ on:
 
 jobs:
   deploy:
-    environment: GCP: Free Plan Project Environment
+    environment: "GCP: Free Plan Project Environment"
     runs-on: ubuntu-latest
 
     permissions:
