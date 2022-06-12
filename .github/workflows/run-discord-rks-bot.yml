@@ -9,7 +9,11 @@ on:
 
 jobs:
 
-  login-google-cloud-platform:
+  deploy:
+
+    permissions:
+      contents: read
+      id-token: write
 
     steps:
 
